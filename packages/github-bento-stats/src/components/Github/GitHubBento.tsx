@@ -92,7 +92,7 @@ export const GitHubBento: React.FC<GitHubBentoProps> = ({
               classname="p-2 md:col-start-5 md:col-end-9 md:row-start-1 md:row-end-2 col-start-4 col-end-5 row-start-3 row-end-5"
             />
             <Commit
-              commits={stats["Total Contibutions"] || 0}
+              commits={stats["Total Contributions"] || stats["Total Contibutions"] || 0}
               classname="p-2 md:col-start-5 md:col-end-7 md:row-start-2 md:row-end-5 col-start-1 col-end-4 row-start-3"
             />
             <PRs
@@ -112,21 +112,25 @@ export const GitHubBento: React.FC<GitHubBentoProps> = ({
               classname="p-2 md:col-start-1 md:col-end-3 md:row-start-3 md:row-end-5 col-start-1 col-end-3 row-start-1"
             />
           </div>
-          <div className="max-sm:px-5 mt-2 w-full max-w-2xl flex  mx-auto">
-            <h1 className="max-w-2xl w-full  font-modernbold text-2xl mb-2">
-              Contribution Graph:
-            </h1>
-          </div>
-          <div className="px-5 rounded-2xl w-full mx-auto flex flex-col relative overflow-auto">
-            <div className="relative max-w-2xl mx-auto">
-              <div
-                className="bg-zinc-800/20 backdrop-blur-2xl border border-zinc-200/10 backdrop-saturate-200 p-3 rounded-2xl mx-auto overflow-auto max-w-2xl opacity-95 hover:opacity-100 z-[9999] cursor-pointer"
-                dangerouslySetInnerHTML={{
-                  __html: graph || "",
-                }}
-              ></div>
-            </div>
-          </div>
+          {showGraph && (
+            <>
+              <div className="max-sm:px-5 mt-2 w-full max-w-2xl flex mx-auto">
+                <h1 className="max-w-2xl w-full font-modernbold text-2xl mb-2">
+                  Contribution Graph:
+                </h1>
+              </div>
+              <div className="px-5 rounded-2xl w-full mx-auto flex flex-col relative overflow-auto">
+                <div className="relative max-w-2xl mx-auto">
+                  <div
+                    className="bg-zinc-800/20 backdrop-blur-2xl border border-zinc-200/10 backdrop-saturate-200 p-3 rounded-2xl mx-auto overflow-auto max-w-2xl opacity-95 hover:opacity-100 z-[9999] cursor-pointer"
+                    dangerouslySetInnerHTML={{
+                      __html: graph || "",
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

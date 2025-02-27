@@ -11,7 +11,8 @@ export interface UserStats {
   Commits: number;
   'Contributed To': number;
   'Star Earned': number;
-  'Total Contibutions': number;
+  'Total Contributions': number; // Fix typo - was 'Total Contibutions'
+  'Total Contibutions'?: number; // Keep for backward compatibility
   'Longest Streak': number;
   'Longest Streak Start': string | null;
   'Longest Streak End': string | null;

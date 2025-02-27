@@ -29,7 +29,7 @@ const Commit = ({
         </p>
       </div>
       <p
-        className={`font-modernbold absolute bottom-5 right-5 max-lg:right-3  ${formatNumber(commits).toString().length >= 4 ? "max-lg:text-5xl" : "max-lg:text-6xl"} text-7xl` }
+        className={`font-modernbold absolute bottom-5 right-5 max-lg:right-3  ${formatNumber(commits).toString().length >= 4 ? "max-lg:text-5xl" : "max-lg:text-6xl"} text-7xl`}
       >
         {formatNumber(commits)}
       </p>

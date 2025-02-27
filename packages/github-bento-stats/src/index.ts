@@ -1,4 +1,4 @@
-import { GitHubBento } from './components/GitHubBento';
+import { GitHubBento } from '@/components/Github/GitHubBento';
 import {
   Followers,
   LongestStreak,
@@ -9,9 +9,9 @@ import {
   PRs,
   Issues,
   ContributedTo
-} from './components/StatComponents';
+} from './components/Github/StatComponents';
 import { useGitHubStats } from './hooks/useGitHubStats';
-import { UserStats, GitHubBentoProvider } from './context/GitHubStatsContext';
+import { type UserStats, GitHubBentoProvider } from './context/GitHubStatsContext';
 
 export {
   GitHubBento,

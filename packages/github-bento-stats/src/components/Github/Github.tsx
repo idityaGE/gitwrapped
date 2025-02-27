@@ -1,18 +1,17 @@
-"use client";
-
-import React, { useEffect, useRef, useState } from "react";
-import Followers from "./Github Components/Followers";
-import LongestStreak from "./Github Components/LongestStreak";
-import Stars from "./Github Components/Stars";
-import CurrentStreak from "./Github Components/CurrentStreak";
-import Repos from "./Github Components/Repos";
-import Commit from "./Github Components/Commits";
-import PRs from "./Github Components/PRs";
-import Issues from "./Github Components/Issues";
-import ContributedTo from "./Github Components/ContributedTo";
-import { useRecoilState, useRecoilValue } from "recoil";
+import React, { useEffect, useRef } from "react";
 import {
-  backgroundState,
+  Followers,
+  LongestStreak,
+  Stars,
+  CurrentStreak,
+  Repos,
+  Commit,
+  PRs,
+  Issues,
+  ContributedTo
+} from './Github Components'
+import { useRecoilValue } from "recoil";
+import {
   graphState,
   loadingState,
   usernameState,
@@ -20,68 +19,14 @@ import {
 } from "@/Recoil/State/atom";
 import { UserStats } from "@/types";
 import Image from "next/image";
-import { Button } from "../ui/button";
-import { ArrowDown } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-import { toPng } from "html-to-image";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
 
 const Github = () => {
   const userStats = useRecoilValue(userStatsState) as UserStats;
   const graph = useRecoilValue(graphState);
   const loading = useRecoilValue(loadingState);
   const username = useRecoilValue(usernameState);
-  const [background, setBackground] = useRecoilState(backgroundState);
-  const [selectedImage, setSelectedImage] = useState<string>("/assets/black.png");
 
   const githubRef = useRef<HTMLDivElement | null>(null);
-
-  const handleDownloadImage = async () => {
-    toast({ title: "Starting Download...", generating: true });
-
-    const node = document.getElementById("github-ss") as HTMLElement;
-    if (!node) return toast({ title: "Failed to find element." });
-
-    toPng(node, { quality: 0.89 })
-      .then(async (dataUrl) => {
-        const base64Data = dataUrl.split(",")[1];
-        toast({ title: "Downloading...", generating: true });
-        const response = await fetch("/api/change-background", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            foregroundPath: base64Data,
-            backgroundPath: background,
-          }),
-        });
-        toast({ title: "Downloading...", generating: true });
-        if (response.ok) {
-          const data = await response.blob();
-          const link = document.createElement("a");
-          const url = URL.createObjectURL(data);
-          toast({ title: "Downloading...", generating: true });
-          link.href = url;
-          link.download = `${username || "user"}.png`;
-          link.click();
-          URL.revokeObjectURL(url);
-          toast({ title: "Bento Downloaded Successfully" });
-        } else {
-          toast({ title: "Error: Slow Internet" });
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-        toast({ title: "Error occurred while downloading." });
-      });
-  };
 
   useEffect(() => {
     if (!loading && githubRef.current) {
@@ -91,75 +36,6 @@ const Github = () => {
 
   return (
     <div className="relative w-full">
-      {!loading && (
-        <div className="absolute top-10 z-20 right-0 max-sm:right-[4.2rem] max-sm:top-2">
-          <Select
-            onValueChange={(value) => {
-              const imageMap: Record<string, string> = {
-                apple: "assets/frame2.png",
-                banana: "assets/bg3.png",
-                blueberry: "assets/bg4.png",
-                grapes: "assets/black.png",
-              };
-              setSelectedImage(`/${imageMap[value]}`);
-              setBackground(`${imageMap[value]}`);
-            }}
-          >
-            <SelectTrigger className="p-2 relative rounded-full overflow-hidden">
-              <Image
-                src={selectedImage} // Dynamically show the selected image
-                alt="Selected"
-                width={100}
-                height={100}
-                className="size-7 rounded-full object-cover"
-              />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="apple">
-                  <Image
-                    src={`/assets/frame2.svg`}
-                    alt=""
-                    width={100}
-                    height={100}
-                    className="size-7 rounded-full object-cover"
-                  />
-                </SelectItem>
-                <SelectItem value="banana">
-                  {" "}
-                  <Image
-                    src={`/assets/frame7.svg`}
-                    alt=""
-                    width={100}
-                    height={100}
-                    className="size-7 rounded-full object-cover"
-                  />
-                </SelectItem>
-                <SelectItem value="blueberry">
-                  {" "}
-                  <Image
-                    src={`/assets/frame9.svg`}
-                    alt=""
-                    width={100}
-                    height={100}
-                    className="size-7 rounded-full object-cover"
-                  />
-                </SelectItem>
-                <SelectItem value="grapes">
-                  {" "}
-                  <Image
-                    src={`/assets/black.png`}
-                    alt=""
-                    width={100}
-                    height={100}
-                    className="size-7 rounded-full object-cover"
-                  />
-                </SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-      )}
       <div id="github-ss" ref={githubRef} className="relative w-full flex items-center justify-center bg-transparent">
         {!loading && (
           <div
@@ -239,18 +115,7 @@ const Github = () => {
             </div>
           </div>
         )}
-        </div>
-      {!loading && (
-        <Button
-          onClick={handleDownloadImage}
-          className="border-zinc-200/20 bg-zinc-800/20 rounded-full py-6 absolute bottom-1 right-1 group z-20 max-sm:top-2 max-sm:right-3"
-        >
-          <ArrowDown size={18} />
-          <p className="font-modernreg text-zinc-400 max-xl:border border-zinc-200/20 max-xl:bg-primary/90 max-xl:p-1 max-xl:text-white/90 px-2 max-xl:px-3 max-xl:rounded-lg bottom-14 right-1 max-xl:absolute lg:flex max-lg:translate-y-2 max-xl:opacity-0 max-xl:group-hover:opacity-100 max-xl:group-hover:translate-y-0 duration-150 lg:group-hover:text-white/80">
-            Download Bento
-          </p>
-        </Button>
-      )}
+      </div>
     </div>
   );
 };

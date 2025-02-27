@@ -18,7 +18,12 @@
     "isolatedModules": true,
     "jsx": "react",
     "declaration": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
   },
   "include": [
     "src"

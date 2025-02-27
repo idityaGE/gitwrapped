@@ -44,7 +44,7 @@ interface GitHubBentoProviderProps {
 
 export const GitHubBentoProvider = ({
   children,
-  username: initialUsername = '',
+  username: initialUsername = 'idityaGE',
   githubToken,
   cacheTime = 3600000 // Default cache time: 1 hour
 }: GitHubBentoProviderProps) => {

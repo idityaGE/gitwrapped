@@ -123,7 +123,7 @@ export const fetchUserStats = async (
         (acc, repo) => acc + repo.stargazerCount,
         0
       ),
-      "Total Contibutions": total,
+      "Total Contributions": total,
       "Longest Streak": longestStreak,
       "Longest Streak Start": longestStreakStartDate,
       "Longest Streak End": longestStreakEndDate,

@@ -23,7 +23,7 @@ interface GitHubBentoProps {
 export const GitHubBento: React.FC<GitHubBentoProps> = ({
   username,
   className = "",
-  showGraph = true,
+  showGraph = false,
   skipContextProvider = false
 }) => {
   const { stats, graph, loading, error } = useGitHubStats({

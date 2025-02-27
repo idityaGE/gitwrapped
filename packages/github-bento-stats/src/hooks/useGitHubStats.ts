@@ -6,14 +6,12 @@ import { fetchUserGraph } from '../utils/fetchGraph';
 interface UseGitHubStatsOptions {
   username?: string;
   skipContext?: boolean;
-  cacheTime?: number;
 }
 
 export const useGitHubStats = (options: UseGitHubStatsOptions = {}) => {
   const {
     username: contextUsername,
     skipContext = false,
-    cacheTime = 3600000 // Default: 1 hour
   } = options;
 
   const context = useGitHubStatsContext();
@@ -21,31 +19,14 @@ export const useGitHubStats = (options: UseGitHubStatsOptions = {}) => {
   const [individualGraph, setIndividualGraph] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastFetched, setLastFetched] = useState<Record<string, number>>({});
 
-  // Use context if available and not skipping it
   const useContextData = !skipContext && context;
-  const username = options.username || (useContextData ? context.username : '');
+  const username = options.username || (useContextData ? context.username : 'idityaGE');
 
   const fetchData = async (username: string) => {
-    if (!username) return;
-
-    // Check if we have cached data that's still valid
-    const now = Date.now();
-    const cacheKey = `github-bento-${username}`;
-    const cachedData = localStorage.getItem(cacheKey);
-    const cachedTime = lastFetched[username];
-
-    if (cachedData && cachedTime && now - cachedTime < cacheTime) {
-      try {
-        const { stats, graph } = JSON.parse(cachedData);
-        setIndividualStats(stats);
-        setIndividualGraph(graph);
-        return;
-      } catch (e) {
-        // If parsing fails, continue with fetching new data
-      }
-    }
+    if (!username) {
+      setError("username is not provided")
+    };
 
     setLoading(true);
     setError(null);
@@ -59,16 +40,6 @@ export const useGitHubStats = (options: UseGitHubStatsOptions = {}) => {
       setIndividualStats(statsResult.userStats);
       setIndividualGraph(graphResult.graph);
 
-      // Cache the results
-      localStorage.setItem(cacheKey, JSON.stringify({
-        stats: statsResult.userStats,
-        graph: graphResult.graph
-      }));
-
-      setLastFetched(prev => ({
-        ...prev,
-        [username]: now
-      }));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch GitHub stats');
     } finally {
@@ -78,10 +49,8 @@ export const useGitHubStats = (options: UseGitHubStatsOptions = {}) => {
 
   useEffect(() => {
     if (useContextData) {
-      // Use data from context
       return;
     } else if (username) {
-      // Fetch data individually
       fetchData(username);
     }
   }, [username, useContextData]);
@@ -92,7 +61,6 @@ export const useGitHubStats = (options: UseGitHubStatsOptions = {}) => {
     }
   };
 
-  // Return context data if using context, otherwise return individual data
   return {
     stats: useContextData ? context.stats : individualStats,
     graph: useContextData ? context.graph : individualGraph,

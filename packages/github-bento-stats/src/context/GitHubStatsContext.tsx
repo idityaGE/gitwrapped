@@ -2,7 +2,6 @@ import React, { createContext, useState, useContext, useEffect, ReactNode } from
 import { fetchUserStats } from '../utils/fetchUser';
 import { fetchUserGraph } from '../utils/fetchGraph';
 
-// Re-export the UserStats interface
 export interface UserStats {
   Followers: number;
   Repositories: number;
@@ -39,21 +38,18 @@ interface GitHubBentoProviderProps {
   children: ReactNode;
   username?: string;
   githubToken?: string;
-  cacheTime?: number; // Time in milliseconds for cache validity
 }
 
 export const GitHubBentoProvider = ({
   children,
   username: initialUsername = 'idityaGE',
   githubToken,
-  cacheTime = 3600000 // Default cache time: 1 hour
 }: GitHubBentoProviderProps) => {
   const [username, setUsername] = useState(initialUsername);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [graph, setGraph] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastFetched, setLastFetched] = useState<Record<string, number>>({});
 
   // Setup token if provided
   useEffect(() => {
@@ -63,23 +59,8 @@ export const GitHubBentoProvider = ({
   }, [githubToken]);
 
   const fetchData = async (username: string) => {
-    if (!username) return;
-
-    // Check if we have cached data that's still valid
-    const now = Date.now();
-    const cacheKey = `github-bento-${username}`;
-    const cachedData = localStorage.getItem(cacheKey);
-    const cachedTime = lastFetched[username];
-
-    if (cachedData && cachedTime && now - cachedTime < cacheTime) {
-      try {
-        const { stats, graph } = JSON.parse(cachedData);
-        setStats(stats);
-        setGraph(graph);
-        return;
-      } catch (e) {
-        // If parsing fails, continue with fetching new data
-      }
+    if (!username) {
+      setError("username is not provided")
     }
 
     setLoading(true);
@@ -94,16 +75,6 @@ export const GitHubBentoProvider = ({
       setStats(statsResult.userStats);
       setGraph(graphResult.graph);
 
-      // Cache the results
-      localStorage.setItem(cacheKey, JSON.stringify({
-        stats: statsResult.userStats,
-        graph: graphResult.graph
-      }));
-
-      setLastFetched(prev => ({
-        ...prev,
-        [username]: now
-      }));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch GitHub stats');
     } finally {

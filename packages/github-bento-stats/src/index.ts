@@ -1,4 +1,4 @@
-import { GitHubBento } from '@/components/Github/GitHubBento';
+import GitHubBento from './components/Github/GitHubBento';
 import {
   Followers,
   LongestStreak,

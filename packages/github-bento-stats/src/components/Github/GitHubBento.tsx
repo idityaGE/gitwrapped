@@ -1,5 +1,5 @@
 import React from "react";
-import { useGitHubStats } from "@/hooks/useGitHubStats";
+import { useGitHubStats } from "../../hooks/useGitHubStats";
 import Image from "next/image";
 import {
   Followers,

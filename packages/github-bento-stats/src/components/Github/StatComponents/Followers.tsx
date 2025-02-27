@@ -1,4 +1,4 @@
-import { formatNumber } from "@/utils/calc";
+import { formatNumber } from "../../../utils/calc";
 import { UserRoundCheck } from "lucide-react";
 import Image from "next/image";
 import React from "react";

@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { Trophy } from "lucide-react";
-import { formatNumber } from "@/utils/calc";
+import { formatNumber } from "../../../utils/calc";
 
 const LongestStreak = ({
   streak,

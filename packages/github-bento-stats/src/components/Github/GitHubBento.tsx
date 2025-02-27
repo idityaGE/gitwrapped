@@ -1,4 +1,6 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
+import { useGitHubStats } from "@/hooks/useGitHubStats";
+import Image from "next/image";
 import {
   Followers,
   LongestStreak,
@@ -9,36 +11,46 @@ import {
   PRs,
   Issues,
   ContributedTo
-} from './Github Components'
-import { useRecoilValue } from "recoil";
-import {
-  graphState,
-  loadingState,
-  usernameState,
-  userStatsState,
-} from "@/Recoil/State/atom";
-import { UserStats } from "@/types";
-import Image from "next/image";
-import { useSetRecoilState } from "recoil";
-import fetchUser from "@/utils/fetchUser";
-import fetchGraph from "@/utils/fetchGraph";
+} from './StatComponents';
 
-const Github = ({
-  username
-}: { username: string }) => {
-  const setUsername = useSetRecoilState(usernameState);
-  const setLoading = useSetRecoilState(loadingState);
-  const setUserStats = useSetRecoilState(userStatsState);
-  const setGraphState = useSetRecoilState(graphState);
+interface GitHubBentoProps {
+  username?: string;
+  className?: string;
+  showGraph?: boolean;
+  skipContextProvider?: boolean;
+}
 
+export const GitHubBento: React.FC<GitHubBentoProps> = ({
+  username,
+  className = "",
+  showGraph = true,
+  skipContextProvider = false
+}) => {
+  const { stats, graph, loading, error } = useGitHubStats({
+    username,
+    skipContext: skipContextProvider
+  });
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-10">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+      </div>
+    );
+  }
 
-  const userStats = useRecoilValue(userStatsState) as UserStats;
-  const graph = useRecoilValue(graphState);
-
+  if (error || !stats || !stats.Repositories) {
+    return (
+      <div className="flex items-center justify-center flex-col p-10">
+        <p className="text-lg font-medium text-red-500">
+          {error || `GitHub user ${username} not found`}
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative w-full">
+    <div className={`relative w-full ${className}`}>
       <div id="github-ss" className="relative w-full flex items-center justify-center bg-transparent">
         <div
           className="text-white z-10 w-full lg:w-[100%] max-w-6xl mx-auto flex items-start justify-start flex-col p-3 relative pt-[3.5rem] "
@@ -46,7 +58,7 @@ const Github = ({
           <div className="flex items-center justify-center gap-4 sm:px-10 px-3  mb-2">
             <div className="">
               <Image
-                src={userStats.AvatarUrl || "/assets/user.svg"}
+                src={stats.AvatarUrl || "/assets/user.svg"}
                 alt="User Avatar"
                 width={100}
                 height={100}
@@ -54,49 +66,49 @@ const Github = ({
               />
             </div>
             <h1 className="font-modernbold leading-tight text-3xl max-w-2xl py-1">
-              {userStats.Repositories ? username : "User not found"}{" "}
-              {userStats.Repositories && "'s Github."}
+              {stats.Repositories ? username : "User not found"}{" "}
+              {stats.Repositories && "'s Github."}
             </h1>
           </div>
           <div className="grid grid-cols-4 grid-rows-4 md:grid-cols-8 md:grid-rows-4 gap-2 w-full md:h-[600px] max-sm:min-h-[100vh]">
             <LongestStreak
-              streak={userStats["Longest Streak"] || 0}
-              start={userStats["Longest Streak Start"] || ""}
-              end={userStats["Longest Streak End"] || ""}
+              streak={stats["Longest Streak"] || 0}
+              start={stats["Longest Streak Start"] || ""}
+              end={stats["Longest Streak End"] || ""}
               classname="p-2 md:col-start-1 md:col-end-3 md:row-start-1 md:row-end-3 col-start-3 col-end-5 "
             />
             <CurrentStreak
-              streak={userStats["Current Streak"] || 0}
-              start={userStats["Current Streak Start"] || ""}
-              end={userStats["Current Streak End"] || ""}
+              streak={stats["Current Streak"] || 0}
+              start={stats["Current Streak Start"] || ""}
+              end={stats["Current Streak End"] || ""}
               classname="p-2 md:col-start-3 md:col-end-5 md:row-start-1 md:row-end-4 col-start-2 col-end-5"
             />
             <Followers
-              followers={userStats.Followers || 0}
+              followers={stats.Followers || 0}
               classname="p-2 md:col-start-7 md:col-end-9 md:row-start-4 md:row-end-5 row-start-4 row-end-4 col-start-2 col-end-3"
             />
             <Repos
-              repos={userStats.Repositories || 0}
+              repos={stats.Repositories || 0}
               classname="p-2 md:col-start-5 md:col-end-9 md:row-start-1 md:row-end-2 col-start-4 col-end-5 row-start-3 row-end-5"
             />
             <Commit
-              commits={userStats["Total Contibutions"] || 0}
+              commits={stats["Total Contibutions"] || 0}
               classname="p-2 md:col-start-5 md:col-end-7 md:row-start-2 md:row-end-5 col-start-1 col-end-4 row-start-3"
             />
             <PRs
-              pr={userStats["Pull Requests"] || 0}
+              pr={stats["Pull Requests"] || 0}
               classname="p-2 md:col-start-7 md:col-end-8 md:row-start-2 md:row-end-4 col-start-1 col-end-2 row-start-2"
             />
             <ContributedTo
-              contros={userStats["Contributed To"] || 0}
+              contros={stats["Contributed To"] || 0}
               classname="p-2 md:col-start-3 md:col-end-5 md:row-start-4 md:row-end-5"
             />
             <Issues
-              issues={userStats.Issues || 0}
+              issues={stats.Issues || 0}
               classname="p-2 md:col-start-8 md:col-end-9 md:row-start-2 md:row-end-4 col-start-1 row-start-4"
             />
             <Stars
-              stars={userStats["Star Earned"] || 0}
+              stars={stats["Star Earned"] || 0}
               classname="p-2 md:col-start-1 md:col-end-3 md:row-start-3 md:row-end-5 col-start-1 col-end-3 row-start-1"
             />
           </div>
@@ -110,7 +122,7 @@ const Github = ({
               <div
                 className="bg-zinc-800/20 backdrop-blur-2xl border border-zinc-200/10 backdrop-saturate-200 p-3 rounded-2xl mx-auto overflow-auto max-w-2xl opacity-95 hover:opacity-100 z-[9999] cursor-pointer"
                 dangerouslySetInnerHTML={{
-                  __html: graph.graph,
+                  __html: graph || "",
                 }}
               ></div>
             </div>
@@ -121,4 +133,4 @@ const Github = ({
   );
 };
 
-export default Github;
+export default GitHubBento;

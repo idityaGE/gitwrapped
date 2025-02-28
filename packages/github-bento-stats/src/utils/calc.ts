@@ -1,3 +1,5 @@
+import { randomBytes } from "crypto";
+
 export const calculateTotalContributions = (
   contributionDays: { date: string; contributionCount: number }[]
 ): { total: number } => {
@@ -83,7 +85,7 @@ export const calculateCurrentStreak = (
   let currentStreak = 0;
   let streakStartDate: string | null = null;
   let streakEndDate: string | null = null;
-  let lastDate = new Date();
+  let lastDate = new Date(); 
 
   for (let i = contributionDays.length - 1; i >= 0; i--) {
     const currentDate = new Date(contributionDays[i].date);
@@ -91,12 +93,12 @@ export const calculateCurrentStreak = (
       (lastDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24);
 
     if (contributionDays[i].contributionCount > 0 && dayDifference <= 1) {
-      if (!currentStreak) streakStartDate = contributionDays[i].date;
+      if (!currentStreak) streakStartDate = contributionDays[i].date; 
       currentStreak++;
-      streakEndDate = contributionDays[i].date;
-      lastDate = currentDate;
+      streakEndDate = contributionDays[i].date; 
+      lastDate = currentDate; 
     } else if (dayDifference > 1) {
-      break;
+      break; 
     }
   }
 
@@ -116,10 +118,19 @@ export const formatDate = (dateString: string | null): string | null => {
   return date.toLocaleDateString("en-US", options);
 };
 
+export function generateRandomString(length: number) {
+  return randomBytes(Math.ceil(length / 2))
+    .toString("hex")
+    .slice(0, length);
+}
+
+
 export function formatNumber(num: number): string {
   if (num >= 1000) {
-    const formatted = Math.floor(num / 1000);
-    return `${formatted}k+`;
+      const formatted = Math.floor(num / 1000); 
+      return `${formatted}k+`;
   }
   return num.toString();
 }
+
+

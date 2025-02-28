@@ -6,8 +6,7 @@ export interface UserStats {
   Commits: number;
   'Contributed To': number;
   'Star Earned': number;
-  'Total Contributions': number;
-  'Total Contibutions'?: number;
+  'Total Contibutions': number;
   'Longest Streak': number;
   'Longest Streak Start': string | null;
   'Longest Streak End': string | null;
@@ -15,5 +14,20 @@ export interface UserStats {
   'Current Streak Start': string | null;
   'Current Streak End': string | null;
   AvatarUrl: string;
-  Failure?: any;
+  Failure?: any
+}
+
+export interface UserData {
+  user: {
+    followers: { totalCount: number };
+    repositoriesWithStargazerCount: {
+      totalCount: number;
+      nodes: { stargazerCount: number }[];
+    };
+    pullRequests: { totalCount: number };
+    issues: { totalCount: number };
+    contributionsCollection: { totalCommitContributions: number; contributionYears: string[]; };
+    repositoriesContributedTo: { totalCount: number };
+    avatarUrl: string;
+  };
 }

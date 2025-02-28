@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { fetchUserStats } from '../utils/fetchUser';
-import { fetchUserGraph } from '../utils/fetchGraph';
+import fetchUser from '../utils/fetchUser';
+import fetchGraph from '../utils/fetchGraph';
 import { UserStats } from '../types/type';
 
 interface UseGitHubStatsOptions {
@@ -21,11 +21,11 @@ export const useGitHubStats = (options: UseGitHubStatsOptions) => {
   const [currentUsername, setCurrentUsername] = useState(username);
 
   // Setup token if provided
-  useEffect(() => {
-    if (githubToken && typeof window !== 'undefined') {
-      window.__GITHUB_BENTO_TOKEN__ = githubToken;
-    }
-  }, [githubToken]);
+  // useEffect(() => {
+  //   if (githubToken && typeof window !== 'undefined') {
+  //     window.__GITHUB_BENTO_TOKEN__ = githubToken;
+  //   }
+  // }, [githubToken]);
 
   const fetchData = async (username: string) => {
     if (!username) {
@@ -38,8 +38,8 @@ export const useGitHubStats = (options: UseGitHubStatsOptions) => {
 
     try {
       const [statsResult, graphResult] = await Promise.all([
-        fetchUserStats(username),
-        fetchUserGraph(username)
+        fetchUser(username),
+        fetchGraph(username)
       ]);
 
       setStats(statsResult.userStats);

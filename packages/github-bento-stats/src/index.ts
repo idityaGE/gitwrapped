@@ -11,7 +11,7 @@ import {
   ContributedTo
 } from './components/Github/StatComponents';
 import { useGitHubStats } from './hooks/useGitHubStats';
-import { type UserStats, GitHubBentoProvider } from './context/GitHubStatsContext';
+import { type UserStats } from './types/type';
 
 export {
   GitHubBento,
@@ -25,6 +25,5 @@ export {
   Issues,
   ContributedTo,
   useGitHubStats,
-  GitHubBentoProvider,
   UserStats
 };

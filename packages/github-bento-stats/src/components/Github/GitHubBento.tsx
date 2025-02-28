@@ -14,21 +14,22 @@ import {
 } from './StatComponents';
 
 interface GitHubBentoProps {
-  username?: string;
+  username: string;
   className?: string;
   showGraph?: boolean;
-  skipContextProvider?: boolean;
+  githubToken: string;
 }
 
 export const GitHubBento: React.FC<GitHubBentoProps> = ({
-  username,
+  username = 'idityaGE',
   className = "",
   showGraph = false,
-  skipContextProvider = false
+  githubToken
 }) => {
+
   const { stats, graph, loading, error } = useGitHubStats({
     username,
-    skipContext: skipContextProvider
+    githubToken
   });
 
   if (loading) {

@@ -1,12 +1,16 @@
 "use client"
 
-import { GitHubBento, GitHubBentoProvider } from "@/packages/github-bento-stats/src";
+import { GitHubBento } from "@/packages/github-bento-stats/src";
 
 const page = () => {
   return (
-    <GitHubBentoProvider username="idityaGE" githubToken={process.env.NEXT_PUBLIC_GITHUB_TOKEN}>
-      <GitHubBento />
-    </GitHubBentoProvider>
+    <>
+      <GitHubBento
+        username="idityaGE"
+        githubToken={process.env.NEXT_PUBLIC_GITHUB_TOKEN}
+        showGraph={false}
+      />
+    </>
   )
 }
 

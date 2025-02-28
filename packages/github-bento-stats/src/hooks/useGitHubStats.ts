@@ -1,32 +1,37 @@
 import { useEffect, useState } from 'react';
-import { useGitHubStatsContext, UserStats } from '../context/GitHubStatsContext';
 import { fetchUserStats } from '../utils/fetchUser';
 import { fetchUserGraph } from '../utils/fetchGraph';
+import { UserStats } from '../types/type';
 
 interface UseGitHubStatsOptions {
-  username?: string;
-  skipContext?: boolean;
+  username: string;
+  githubToken: string;
 }
 
-export const useGitHubStats = (options: UseGitHubStatsOptions = {}) => {
+export const useGitHubStats = (options: UseGitHubStatsOptions) => {
   const {
-    username: contextUsername,
-    skipContext = false,
+    username = 'idityaGE',
+    githubToken
   } = options;
 
-  const context = useGitHubStatsContext();
-  const [individualStats, setIndividualStats] = useState<UserStats | null>(null);
-  const [individualGraph, setIndividualGraph] = useState<string | null>(null);
+  const [stats, setStats] = useState<UserStats | null>(null);
+  const [graph, setGraph] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentUsername, setCurrentUsername] = useState(username);
 
-  const useContextData = !skipContext && context;
-  const username = options.username || (useContextData ? context.username : 'idityaGE');
+  // Setup token if provided
+  useEffect(() => {
+    if (githubToken && typeof window !== 'undefined') {
+      window.__GITHUB_BENTO_TOKEN__ = githubToken;
+    }
+  }, [githubToken]);
 
   const fetchData = async (username: string) => {
     if (!username) {
-      setError("username is not provided")
-    };
+      setError("Username is not provided");
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -37,9 +42,8 @@ export const useGitHubStats = (options: UseGitHubStatsOptions = {}) => {
         fetchUserGraph(username)
       ]);
 
-      setIndividualStats(statsResult.userStats);
-      setIndividualGraph(graphResult.graph);
-
+      setStats(statsResult.userStats);
+      setGraph(graphResult.graph);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch GitHub stats');
     } finally {
@@ -47,30 +51,26 @@ export const useGitHubStats = (options: UseGitHubStatsOptions = {}) => {
     }
   };
 
+
   useEffect(() => {
-    if (useContextData) {
-      return;
-    } else if (username) {
-      fetchData(username);
-    }
-  }, [username, useContextData]);
+    fetchData(currentUsername);
+  }, [currentUsername, githubToken]);
+
+  const setUsername = (newUsername: string) => {
+    setCurrentUsername(newUsername);
+  };
 
   const refetch = async () => {
-    if (username) {
-      await fetchData(username);
-    }
+    await fetchData(currentUsername);
   };
 
   return {
-    stats: useContextData ? context.stats : individualStats,
-    graph: useContextData ? context.graph : individualGraph,
-    loading: useContextData ? context.loading : loading,
-    error: useContextData ? context.error : error,
-    username: useContextData ? context.username : username,
-    setUsername: useContextData ? context.setUsername : (name: string) => {
-      options.username = name;
-      fetchData(name);
-    },
-    refetch: useContextData ? context.refetch : refetch
+    stats,
+    graph,
+    loading,
+    error,
+    username: currentUsername,
+    setUsername,
+    refetch
   };
 };

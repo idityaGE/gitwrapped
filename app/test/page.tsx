@@ -4,7 +4,7 @@ import { GitHubBento, GitHubBentoProvider } from "@/packages/github-bento-stats/
 
 const page = () => {
   return (
-    <GitHubBentoProvider username="idityaGE" githubToken="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">
+    <GitHubBentoProvider username="idityaGE" githubToken={process.env.NEXT_PUBLIC_GITHUB_TOKEN}>
       <GitHubBento />
     </GitHubBentoProvider>
   )

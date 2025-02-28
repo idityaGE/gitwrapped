@@ -7,7 +7,7 @@ const page = () => {
     <>
       <GitHubBento
         username="idityaGE"
-        githubToken={process.env.NEXT_PUBLIC_GITHUB_TOKEN || ""}
+        githubToken={process.env.NEXT_PUBLIC_GITHUB_TOKEN}
         showGraph={false}
       />
     </>

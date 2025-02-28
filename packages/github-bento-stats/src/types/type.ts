@@ -6,7 +6,7 @@ export interface UserStats {
   Commits: number;
   'Contributed To': number;
   'Star Earned': number;
-  'Total Contibutions': number;
+  'Total Contributions': number;
   'Longest Streak': number;
   'Longest Streak Start': string | null;
   'Longest Streak End': string | null;

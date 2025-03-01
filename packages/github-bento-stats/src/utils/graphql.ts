@@ -1,6 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
 export const graphQL = async ({
     query,
     variables,
@@ -8,11 +5,11 @@ export const graphQL = async ({
 }: {
     query: string;
     variables: Record<string, any>;
-    token?: string;
+    token: string;
 }) => {
     try {
         // Use the passed token, fallback to environment variable
-        const authToken = token || process.env.NEXT_PUBLIC_GITHUB_TOKEN;
+        const authToken = token;
 
         if (!authToken) {
             console.warn('No GitHub token provided');

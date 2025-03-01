@@ -3,7 +3,7 @@ import { graphQL } from "./graphql";
 export async function fetchYearContributions(
   username: string,
   year: number,
-  token?: string
+  token: string
 ): Promise<{ date: string; contributionCount: number }[]> {
   const query = `
     query ($user: String!, $from: DateTime!, $to: DateTime!) {

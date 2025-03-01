@@ -48,7 +48,7 @@ const userStatsQuery = `
 
 const fetchUser = async (
   username: string,
-  token?: string
+  token: string
 ): Promise<{ userStats: UserStats }> => {
   try {
     const query = `

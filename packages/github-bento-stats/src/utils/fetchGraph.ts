@@ -8,7 +8,7 @@ function getFillColor(count: number): string {
   return "#39D353";
 }
 
-const fetchGraph = async (username: string, token?: string): Promise<{ graph: string }> => {
+const fetchGraph = async (username: string, token: string): Promise<{ graph: string }> => {
   try {
     const currentYear = new Date().getFullYear();
     const currentYearContributions = await fetchYearContributions(

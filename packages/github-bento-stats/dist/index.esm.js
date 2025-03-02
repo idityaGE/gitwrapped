@@ -58,6 +58,16 @@ function __generator(thisArg, body) {
     }
 }
 
+function __spreadArray(to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+}
+
 typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
     var e = new Error(message);
     return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
@@ -320,34 +330,56 @@ function getFillColor(count) {
     return "#39D353";
 }
 var fetchGraph = function (username, token) { return __awaiter(void 0, void 0, void 0, function () {
-    var currentYear, currentYearContributions, dayWidth_1, dayHeight_1, dayPadding_1, weekPadding_1, svgPadding_1, startDate, startDayIndex, shiftDays, adjustedContributions, weeks, currentWeek, i, numWeeks, svgHeight, svgWidth, graph, error_1;
+    var today, todayStr_1, oneYearAgo, currentYear, previousYear, currentYearContributions, previousYearContributions, allContributions, oneYearAgoStr_1, lastYearContributions, dayWidth_1, dayHeight_1, dayPadding_1, weekPadding_1, svgPadding_1, startDate, startDayIndex, emptyStartDays, allDays, weeks, currentWeek, i, numWeeks, svgHeight, svgWidth, graph, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
-                currentYear = new Date().getFullYear();
+                _a.trys.push([0, 3, , 4]);
+                today = new Date();
+                todayStr_1 = today.toISOString().split('T')[0];
+                oneYearAgo = new Date();
+                oneYearAgo.setFullYear(today.getFullYear() - 1);
+                oneYearAgo.setDate(today.getDate() + 1); // Add one day to make it inclusive
+                currentYear = today.getFullYear();
+                previousYear = oneYearAgo.getFullYear();
                 return [4 /*yield*/, fetchYearContributions(username, currentYear, token)];
             case 1:
                 currentYearContributions = _a.sent();
-                if (currentYearContributions.length === 0)
-                    return [2 /*return*/, { graph: "No contributions this year" }];
+                return [4 /*yield*/, fetchYearContributions(username, previousYear, token)];
+            case 2:
+                previousYearContributions = _a.sent();
+                allContributions = __spreadArray(__spreadArray([], previousYearContributions, true), currentYearContributions, true);
+                // Sort by date
+                allContributions.sort(function (a, b) { return new Date(a.date).getTime() - new Date(b.date).getTime(); });
+                oneYearAgoStr_1 = oneYearAgo.toISOString().split('T')[0];
+                lastYearContributions = allContributions.filter(function (day) { return day.date >= oneYearAgoStr_1 && day.date <= todayStr_1; });
+                if (lastYearContributions.length === 0)
+                    return [2 /*return*/, { graph: "No contributions in the last year" }];
                 dayWidth_1 = 10;
                 dayHeight_1 = 10;
                 dayPadding_1 = 2;
                 weekPadding_1 = 2;
                 svgPadding_1 = 0;
-                startDate = new Date(currentYear, 0, 1);
+                startDate = new Date(lastYearContributions[0].date);
                 startDayIndex = startDate.getDay();
-                shiftDays = startDayIndex;
-                adjustedContributions = new Array(shiftDays).fill({ contributionCount: 0 }).concat(currentYearContributions);
+                emptyStartDays = new Array(startDayIndex).fill({ date: '', contributionCount: 0 });
+                allDays = __spreadArray(__spreadArray([], emptyStartDays, true), lastYearContributions, true);
                 weeks = [];
                 currentWeek = [];
-                for (i = 0; i < adjustedContributions.length; i++) {
-                    currentWeek.push(adjustedContributions[i]);
-                    if (currentWeek.length === 7 || i === adjustedContributions.length - 1) {
+                for (i = 0; i < allDays.length; i++) {
+                    currentWeek.push(allDays[i]);
+                    if (currentWeek.length === 7) {
                         weeks.push(currentWeek);
                         currentWeek = [];
                     }
+                }
+                // If there are remaining days in the current week, add them
+                if (currentWeek.length > 0) {
+                    // Fill the remaining days of the week with empty cells
+                    while (currentWeek.length < 7) {
+                        currentWeek.push({ date: '', contributionCount: 0 });
+                    }
+                    weeks.push(currentWeek);
                 }
                 numWeeks = weeks.length;
                 svgHeight = 7 * (dayHeight_1 + dayPadding_1) + 2 * svgPadding_1;
@@ -357,8 +389,7 @@ var fetchGraph = function (username, token) { return __awaiter(void 0, void 0, v
                     return week
                         .map(function (day, dayIndex) {
                         var x = svgPadding_1 + weekIndex * (dayWidth_1 + weekPadding_1);
-                        var y = svgPadding_1 +
-                            dayIndex * (dayHeight_1 + dayPadding_1);
+                        var y = svgPadding_1 + dayIndex * (dayHeight_1 + dayPadding_1);
                         var fillColor = getFillColor(day.contributionCount);
                         return "<rect x=\"".concat(x, "\" y=\"").concat(y, "\" width=\"").concat(dayWidth_1, "\" height=\"").concat(dayHeight_1, "\" fill=\"").concat(fillColor, "\" strokeWidth=\"0.5\" stroke=\"#5d5e5e20\" rx=\"2\" ry=\"2\" />");
                     })
@@ -368,13 +399,13 @@ var fetchGraph = function (username, token) { return __awaiter(void 0, void 0, v
                 return [2 /*return*/, {
                         graph: graph,
                     }];
-            case 2:
+            case 3:
                 error_1 = _a.sent();
                 console.log(error_1);
                 return [2 /*return*/, {
                         graph: "Error",
                     }];
-            case 3: return [2 /*return*/];
+            case 4: return [2 /*return*/];
         }
     });
 }); };

@@ -11,7 +11,7 @@ const page = () => {
   return (
     <>
       <GitHubBento
-        username="idityaGE"
+        username="NitinDarker"
         githubToken={gittoken || ""}
         showGraph
       />

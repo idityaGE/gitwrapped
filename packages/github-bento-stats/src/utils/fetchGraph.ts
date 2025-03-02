@@ -12,6 +12,7 @@ const fetchGraph = async (username: string, token: string): Promise<{ graph: str
   try {
     // Calculate dates for the last 365 days
     const today = new Date();
+    const todayStr = today.toISOString().split('T')[0]; // Format as YYYY-MM-DD
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(today.getFullYear() - 1);
     oneYearAgo.setDate(today.getDate() + 1); // Add one day to make it inclusive
@@ -39,10 +40,10 @@ const fetchGraph = async (username: string, token: string): Promise<{ graph: str
     // Sort by date
     allContributions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    // Filter to only keep the last 365 days
+    // Filter to only keep contributions from one year ago up to today
     const oneYearAgoStr = oneYearAgo.toISOString().split('T')[0];
     const lastYearContributions = allContributions.filter(
-      day => day.date >= oneYearAgoStr
+      day => day.date >= oneYearAgoStr && day.date <= todayStr
     );
 
     if (lastYearContributions.length === 0) return { graph: "No contributions in the last year" };
@@ -58,21 +59,32 @@ const fetchGraph = async (username: string, token: string): Promise<{ graph: str
     const startDate = new Date(lastYearContributions[0].date);
     const startDayIndex = startDate.getDay();
 
-    // Pad with empty days to align with week start
-    const shiftDays = startDayIndex;
-    const adjustedContributions = new Array(shiftDays).fill({ date: '', contributionCount: 0 }).concat(lastYearContributions);
+    // Pad with empty days at the beginning to align with week start
+    const emptyStartDays = new Array(startDayIndex).fill({ date: '', contributionCount: 0 });
+
+    // Calculate and create complete weeks
+    const allDays = [...emptyStartDays, ...lastYearContributions];
 
     // Group by weeks
     const weeks = [];
     let currentWeek: { date: string; contributionCount: number }[] = [];
 
-    for (let i = 0; i < adjustedContributions.length; i++) {
-      currentWeek.push(adjustedContributions[i]);
+    for (let i = 0; i < allDays.length; i++) {
+      currentWeek.push(allDays[i]);
 
-      if (currentWeek.length === 7 || i === adjustedContributions.length - 1) {
+      if (currentWeek.length === 7) {
         weeks.push(currentWeek);
         currentWeek = [];
       }
+    }
+
+    // If there are remaining days in the current week, add them
+    if (currentWeek.length > 0) {
+      // Fill the remaining days of the week with empty cells
+      while (currentWeek.length < 7) {
+        currentWeek.push({ date: '', contributionCount: 0 });
+      }
+      weeks.push(currentWeek);
     }
 
     // Create SVG

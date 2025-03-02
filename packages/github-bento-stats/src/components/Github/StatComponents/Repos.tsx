@@ -1,6 +1,7 @@
 import { formatNumber } from "../../../utils/calc";
 import { BookMarked } from "lucide-react";
 import React from "react";
+import { images } from '../../../images'
 
 const Repos = ({ repos, classname }: { repos: number; classname: string }) => {
   return (
@@ -9,7 +10,7 @@ const Repos = ({ repos, classname }: { repos: number; classname: string }) => {
     >
       {/* <HalfCircleGradient  /> */}
       <img
-        src={`/assets/grad1.svg`}
+        src={images.assets.grad1}
         alt=""
         width={500}
         height={500}
@@ -19,7 +20,7 @@ const Repos = ({ repos, classname }: { repos: number; classname: string }) => {
         <BookMarked className="size-10" />
         <p className="font-modernbold text-lg lg:text-xl pt-1">Repos<span className="max-sm:hidden">itories</span></p>
       </div>
-      <p className={` font-modernbold absolute bottom-5 right-3 text-7xl max-lg:text-6xl max-sm:text-4xl ${formatNumber(repos).toString().length >= 4 ? "max-sm:right-1": ""} `}>
+      <p className={` font-modernbold absolute bottom-5 right-3 text-7xl max-lg:text-6xl max-sm:text-4xl ${formatNumber(repos).toString().length >= 4 ? "max-sm:right-1" : ""} `}>
         {formatNumber(repos)}
       </p>
     </div>

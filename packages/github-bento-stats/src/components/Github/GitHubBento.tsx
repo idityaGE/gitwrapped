@@ -11,6 +11,7 @@ import {
   Issues,
   ContributedTo
 } from './StatComponents';
+import { images } from '../../images'
 
 interface GitHubBentoProps {
   username: string;
@@ -58,7 +59,7 @@ export const GitHubBento: React.FC<GitHubBentoProps> = ({
           <div className="flex items-center justify-center gap-4 sm:px-10 px-3  mb-2">
             <div className="">
               <img
-                src={stats.AvatarUrl || "/assets/user.svg"}
+                src={stats.AvatarUrl || images.assets.user}
                 alt="User Avatar"
                 width={100}
                 height={100}

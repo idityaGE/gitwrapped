@@ -1,5 +1,6 @@
 import { formatNumber } from "../../../utils/calc";
 import React from "react";
+import { images } from '../../../images'
 
 const PRs = ({ pr, classname }: { pr: number; classname: string }) => {
   return (
@@ -8,7 +9,7 @@ const PRs = ({ pr, classname }: { pr: number; classname: string }) => {
     >
       {/* <HalfCircleGradient  /> */}
       <img
-        src={`/assets/grad5.svg`}
+        src={images.assets.grad5}
         alt=""
         width={500}
         height={500}
@@ -16,7 +17,7 @@ const PRs = ({ pr, classname }: { pr: number; classname: string }) => {
       />
       <div className="absolute top-3 left-3">
         <img
-          src={`/icons/pr.svg`}
+          src={images.icons.pr}
           alt=""
           width={100}
           height={100}
@@ -25,7 +26,7 @@ const PRs = ({ pr, classname }: { pr: number; classname: string }) => {
         <p className="font-modernbold lg:text-xl pt-1">PRs</p>
       </div>
       <p
-        className={` font-modernbold absolute bottom-5 right-3 max-lg:right-2  max-sm:text-4xl ${formatNumber(pr).toString().length >= 3 ? "max-lg:right-1 max-lg:text-4xl text-5xl": "max-lg:right-2 text-6xl max-lg:text-5xl"} `}
+        className={` font-modernbold absolute bottom-5 right-3 max-lg:right-2  max-sm:text-4xl ${formatNumber(pr).toString().length >= 3 ? "max-lg:right-1 max-lg:text-4xl text-5xl" : "max-lg:right-2 text-6xl max-lg:text-5xl"} `}
       >
         {formatNumber(pr)}
       </p>

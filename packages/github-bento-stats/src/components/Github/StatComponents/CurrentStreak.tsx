@@ -1,6 +1,7 @@
 import { formatNumber } from "../../../utils/calc";
 import { Flame } from "lucide-react";
 import React from "react";
+import { images } from '../../../images'
 
 const CurrentStreak = ({
   classname,
@@ -18,7 +19,7 @@ const CurrentStreak = ({
       className={`${classname} flex items-center justify-center flex-col gap-3 relative rounded-3xl overflow-hidden p-5 max-lg:p-3 bg-black/90 z-[90]  group cursor-pointer`}
     >
       <img
-        src={`/assets/frame9.svg`}
+        src={images.assets.frame9Svg}
         alt=""
         width={500}
         height={500}

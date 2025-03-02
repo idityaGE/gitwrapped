@@ -1,6 +1,7 @@
 import React from "react";
 import { Trophy } from "lucide-react";
 import { formatNumber } from "../../../utils/calc";
+import { images } from '../../../images'
 
 const LongestStreak = ({
   streak,
@@ -17,7 +18,7 @@ const LongestStreak = ({
     <div className={`${classname} flex items-center justify-center flex-col gap-3 relative rounded-3xl overflow-hidden p-3 z-[90] bg-black/90 group cursor-pointer`}>
         {/* <HalfCircleGradient  /> */}
         <img
-            src={`/assets/frame7.svg`}
+            src={images.assets.frame7}
             alt=""
             width={500}
             height={500}

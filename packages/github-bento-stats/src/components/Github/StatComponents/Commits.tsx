@@ -1,6 +1,7 @@
 import { formatNumber } from "../../../utils/calc";
 import { Command } from "lucide-react";
 import React from "react";
+import { images } from '../../../images'
 
 const Commit = ({
   commits,
@@ -14,7 +15,7 @@ const Commit = ({
       className={`${classname} flex items-center justify-center flex-col gap-3 relative rounded-3xl overflow-hidden bg-black/90 z-[90]  group cursor-pointer`}
     >
       <img
-        src={`/assets/grad2.svg`}
+        src={images.assets.grad2}
         alt=""
         width={500}
         height={500}

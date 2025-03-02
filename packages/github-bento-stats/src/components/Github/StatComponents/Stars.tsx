@@ -1,6 +1,7 @@
 import { formatNumber } from "../../../utils/calc";
 import { StarsIcon } from "lucide-react";
 import React from "react";
+import { images } from '../../../images'
 
 const Stars = ({ classname, stars }: { classname: string; stars: number }) => {
   return (
@@ -9,7 +10,7 @@ const Stars = ({ classname, stars }: { classname: string; stars: number }) => {
     >
       {/* <HalfCircleGradient  /> */}
       <img
-        src={`/assets/grain.svg`}
+        src={images.assets.grain}
         alt=""
         width={500}
         height={500}

@@ -1,6 +1,7 @@
 import { formatNumber } from "../../../utils/calc";
 import { UserRoundCheck } from "lucide-react";
 import React from "react";
+import { images } from '../../../images'
 
 const Followers = ({
   followers,
@@ -15,7 +16,7 @@ const Followers = ({
     >
       {/* <HalfCircleGradient  /> */}
       <img
-        src={`/assets/frame2.svg`}
+        src={images.assets.frame2}
         alt=""
         width={500}
         height={500}

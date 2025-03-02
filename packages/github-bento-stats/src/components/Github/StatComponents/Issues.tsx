@@ -1,5 +1,6 @@
 import { formatNumber } from "../../../utils/calc";
 import React from "react";
+import { images } from '../../../images'
 
 const Issues = ({
   issues,
@@ -14,7 +15,7 @@ const Issues = ({
     >
       {/* <HalfCircleGradient  /> */}
       <img
-        src={`/assets/grad4.svg`}
+        src={images.assets.grad4}
         alt=""
         width={500}
         height={500}
@@ -22,17 +23,17 @@ const Issues = ({
       />
       <div className="absolute top-3 left-3 max-sm:top-2 max-sm:left-2">
         <img
-          src={`/icons/issues.svg`}
+          src={images.icons.issues}
           alt=""
           width={100}
           height={100}
           className="size-10"
         />
         <p className="font-modernbold lg:text-xl pt-1">
-        Issues
+          Issues
         </p>
       </div>
-      <p className={`font-modernbold absolute bottom-5 right-3  max-xl:right-2  max-sm:text-4xl ${formatNumber(issues).toString().length >= 3 ? "max-lg:right-1 text-5xl max-lg:text-4xl": "max-lg:right-2 text-6xl max-lg:text-5xl"} `}>
+      <p className={`font-modernbold absolute bottom-5 right-3  max-xl:right-2  max-sm:text-4xl ${formatNumber(issues).toString().length >= 3 ? "max-lg:right-1 text-5xl max-lg:text-4xl" : "max-lg:right-2 text-6xl max-lg:text-5xl"} `}>
         {formatNumber(issues)}
       </p>
     </div>

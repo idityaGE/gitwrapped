@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react');
+require('crypto');
 var require$$2 = require('react/jsx-runtime');
 var require$$4 = require('react-dom');
 
@@ -20,17 +21,6 @@ PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
 /* global Reflect, Promise, SuppressedError, Symbol, Iterator */
 
-
-var __assign = function() {
-    __assign = Object.assign || function __assign(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 
 function __awaiter(thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -76,16 +66,15 @@ typeof SuppressedError === "function" ? SuppressedError : function (error, suppr
 };
 
 var graphQL = function (_a) { return __awaiter(void 0, [_a], void 0, function (_b) {
-    var token, authToken, response, data, error_1;
-    var query = _b.query, variables = _b.variables;
+    var authToken, response, errorData, data, error_1;
+    var query = _b.query, variables = _b.variables, token = _b.token;
     return __generator(this, function (_c) {
         switch (_c.label) {
             case 0:
-                _c.trys.push([0, 3, , 4]);
-                token = typeof window !== 'undefined' ? window.__GITHUB_BENTO_TOKEN__ : undefined;
-                authToken = token || process.env.NEXT_PUBLIC_GITHUB_TOKEN || '';
+                _c.trys.push([0, 5, , 6]);
+                authToken = token;
                 if (!authToken) {
-                    console.warn('GitHub token not found. Set it via GitHubBentoProvider or NEXT_PUBLIC_GITHUB_TOKEN');
+                    console.warn('No GitHub token provided');
                 }
                 return [4 /*yield*/, fetch('https://api.github.com/graphql', {
                         method: "POST",
@@ -98,26 +87,25 @@ var graphQL = function (_a) { return __awaiter(void 0, [_a], void 0, function (_
                     })];
             case 1:
                 response = _c.sent();
-                if (!response.ok) {
-                    throw new Error("Request failed ".concat(response.status));
-                }
+                if (!!response.ok) return [3 /*break*/, 3];
                 return [4 /*yield*/, response.json()];
             case 2:
+                errorData = _c.sent();
+                throw new Error("Request failed with status ".concat(response.status, ": ").concat(errorData.message));
+            case 3: return [4 /*yield*/, response.json()];
+            case 4:
                 data = _c.sent();
-                if (data.errors) {
-                    throw new Error(data.errors[0].message);
-                }
                 return [2 /*return*/, data.data];
-            case 3:
+            case 5:
                 error_1 = _c.sent();
-                console.error("GraphQL request error:", error_1);
+                console.error('GraphQL request error:', error_1);
                 throw error_1;
-            case 4: return [2 /*return*/];
+            case 6: return [2 /*return*/];
         }
     });
 }); };
 
-function fetchYearContributions(username, year) {
+function fetchYearContributions(username, year, token) {
     return __awaiter(this, void 0, void 0, function () {
         var query, startYear, endYear, data, weeks, contributionDays;
         return __generator(this, function (_a) {
@@ -126,10 +114,14 @@ function fetchYearContributions(username, year) {
                     query = "\n    query ($user: String!, $from: DateTime!, $to: DateTime!) {\n      user(login: $user) {\n        contributionsCollection(from: $from, to: $to) {\n          contributionCalendar {\n            weeks {\n              contributionDays {\n                date\n                contributionCount\n              }\n            }\n          }\n        }\n      }\n    }\n  ";
                     startYear = "".concat(year, "-01-01T00:00:00Z");
                     endYear = "".concat(year, "-12-31T23:59:59Z");
-                    return [4 /*yield*/, graphQL({ query: query, variables: { user: username, from: startYear, to: endYear } })];
+                    return [4 /*yield*/, graphQL({
+                            query: query,
+                            variables: { user: username, from: startYear, to: endYear },
+                            token: token
+                        })];
                 case 1:
                     data = _a.sent();
-                    if (!(data === null || data === void 0 ? void 0 : data.user))
+                    if (!data.user)
                         return [2 /*return*/, []];
                     weeks = data.user.contributionsCollection.contributionCalendar.weeks;
                     contributionDays = [];
@@ -246,7 +238,7 @@ function formatNumber(num) {
 }
 
 var userStatsQuery = "\n  followers {\n    totalCount\n  }\n  contributionsCollection {\n    totalCommitContributions\n  }\n  repositoriesContributedTo(\n    first: 1\n    contributionTypes: [COMMIT, ISSUE, PULL_REQUEST, REPOSITORY]\n  ) {\n    totalCount\n  }\n  pullRequests(first: 1) {\n    totalCount\n  }\n  issues(first: 1) {\n    totalCount\n  }\n  createdAt\n  updatedAt\n  repositoriesWithStargazerCount: repositories(\n    first: 100\n    privacy: PUBLIC\n    ownerAffiliations: OWNER\n    orderBy: {field: STARGAZERS, direction: DESC}\n  ) {\n    totalCount\n    nodes {\n      stargazerCount\n    }\n  }\n  contributionsCollection {\n    contributionYears\n  }\n  avatarUrl\n";
-var fetchUserStats = function (username) { return __awaiter(void 0, void 0, void 0, function () {
+var fetchUser = function (username, token) { return __awaiter(void 0, void 0, void 0, function () {
     var query, response, data, contibutonYears, allContributionDays, _i, contibutonYears_1, year, yearContributions, total, _a, longestStreak, longestStreakStart, longestStreakEnd, longestStreakStartDate, longestStreakEndDate, _b, currentStreak, currentStreakStart, currentStreakEnd, currentStreakStartDate, currentStreakEndDate, userStats, error_1;
     return __generator(this, function (_c) {
         switch (_c.label) {
@@ -255,7 +247,11 @@ var fetchUserStats = function (username) { return __awaiter(void 0, void 0, void
                 query = "\n        query ($username: String!){\n            user (login: $username) {\n                ".concat(userStatsQuery, "\n            }\n        }\n    ");
                 if (!username)
                     return [2 /*return*/, { userStats: {} }];
-                return [4 /*yield*/, graphQL({ query: query, variables: { username: username } })];
+                return [4 /*yield*/, graphQL({
+                        query: query,
+                        variables: { username: username },
+                        token: token
+                    })];
             case 1:
                 response = _c.sent();
                 data = response;
@@ -268,7 +264,7 @@ var fetchUserStats = function (username) { return __awaiter(void 0, void 0, void
             case 2:
                 if (!(_i < contibutonYears_1.length)) return [3 /*break*/, 5];
                 year = contibutonYears_1[_i];
-                return [4 /*yield*/, fetchYearContributions(username, Number(year))];
+                return [4 /*yield*/, fetchYearContributions(username, Number(year), token)];
             case 3:
                 yearContributions = _c.sent();
                 allContributionDays = allContributionDays.concat(yearContributions);
@@ -307,7 +303,7 @@ var fetchUserStats = function (username) { return __awaiter(void 0, void 0, void
                     }];
             case 6:
                 error_1 = _c.sent();
-                console.error("Error fetching user stats:", error_1);
+                console.log(error_1);
                 return [2 /*return*/, { userStats: {} }];
             case 7: return [2 /*return*/];
         }
@@ -325,14 +321,14 @@ function getFillColor(count) {
         return "#26A641";
     return "#39D353";
 }
-var fetchUserGraph = function (username) { return __awaiter(void 0, void 0, void 0, function () {
+var fetchGraph = function (username, token) { return __awaiter(void 0, void 0, void 0, function () {
     var currentYear, currentYearContributions, dayWidth_1, dayHeight_1, dayPadding_1, weekPadding_1, svgPadding_1, startDate, startDayIndex, shiftDays, adjustedContributions, weeks, currentWeek, i, numWeeks, svgHeight, svgWidth, graph, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
                 currentYear = new Date().getFullYear();
-                return [4 /*yield*/, fetchYearContributions(username, currentYear)];
+                return [4 /*yield*/, fetchYearContributions(username, currentYear, token)];
             case 1:
                 currentYearContributions = _a.sent();
                 if (currentYearContributions.length === 0)
@@ -345,7 +341,7 @@ var fetchUserGraph = function (username) { return __awaiter(void 0, void 0, void
                 startDate = new Date(currentYear, 0, 1);
                 startDayIndex = startDate.getDay();
                 shiftDays = startDayIndex;
-                adjustedContributions = new Array(shiftDays).fill({ date: "", contributionCount: 0 }).concat(currentYearContributions);
+                adjustedContributions = new Array(shiftDays).fill({ contributionCount: 0 }).concat(currentYearContributions);
                 weeks = [];
                 currentWeek = [];
                 for (i = 0; i < adjustedContributions.length; i++) {
@@ -376,7 +372,7 @@ var fetchUserGraph = function (username) { return __awaiter(void 0, void 0, void
                     }];
             case 2:
                 error_1 = _a.sent();
-                console.error("Error fetching contribution graph:", error_1);
+                console.log(error_1);
                 return [2 /*return*/, {
                         graph: "Error",
                     }];
@@ -385,176 +381,66 @@ var fetchUserGraph = function (username) { return __awaiter(void 0, void 0, void
     });
 }); };
 
-var GitHubStatsContext = React.createContext(undefined);
-var GitHubBentoProvider = function (_a) {
-    var children = _a.children, _b = _a.username, initialUsername = _b === void 0 ? 'idityaGE' : _b, githubToken = _a.githubToken, _c = _a.cacheTime // Default cache time: 1 hour
-    , cacheTime = _c === void 0 ? 3600000 : _c // Default cache time: 1 hour
-    ;
-    var _d = React.useState(initialUsername), username = _d[0], setUsername = _d[1];
-    var _e = React.useState(null), stats = _e[0], setStats = _e[1];
-    var _f = React.useState(null), graph = _f[0], setGraph = _f[1];
-    var _g = React.useState(false), loading = _g[0], setLoading = _g[1];
-    var _h = React.useState(null), error = _h[0], setError = _h[1];
-    var _j = React.useState({}), lastFetched = _j[0], setLastFetched = _j[1];
-    // Setup token if provided
-    React.useEffect(function () {
-        if (githubToken) {
-            window.__GITHUB_BENTO_TOKEN__ = githubToken;
-        }
-    }, [githubToken]);
-    var fetchData = function (username) { return __awaiter(void 0, void 0, void 0, function () {
-        var now, cacheKey, cachedData, cachedTime, _a, stats_1, graph_1, _b, statsResult, graphResult, err_1;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
-                case 0:
-                    if (!username)
-                        return [2 /*return*/];
-                    now = Date.now();
-                    cacheKey = "github-bento-".concat(username);
-                    cachedData = localStorage.getItem(cacheKey);
-                    cachedTime = lastFetched[username];
-                    if (cachedData && cachedTime && now - cachedTime < cacheTime) {
-                        try {
-                            _a = JSON.parse(cachedData), stats_1 = _a.stats, graph_1 = _a.graph;
-                            setStats(stats_1);
-                            setGraph(graph_1);
-                            return [2 /*return*/];
-                        }
-                        catch (e) {
-                            // If parsing fails, continue with fetching new data
-                        }
-                    }
-                    setLoading(true);
-                    setError(null);
-                    _c.label = 1;
-                case 1:
-                    _c.trys.push([1, 3, 4, 5]);
-                    return [4 /*yield*/, Promise.all([
-                            fetchUserStats(username),
-                            fetchUserGraph(username)
-                        ])];
-                case 2:
-                    _b = _c.sent(), statsResult = _b[0], graphResult = _b[1];
-                    setStats(statsResult.userStats);
-                    setGraph(graphResult.graph);
-                    // Cache the results
-                    localStorage.setItem(cacheKey, JSON.stringify({
-                        stats: statsResult.userStats,
-                        graph: graphResult.graph
-                    }));
-                    setLastFetched(function (prev) {
-                        var _a;
-                        return (__assign(__assign({}, prev), (_a = {}, _a[username] = now, _a)));
-                    });
-                    return [3 /*break*/, 5];
-                case 3:
-                    err_1 = _c.sent();
-                    setError(err_1 instanceof Error ? err_1.message : 'Failed to fetch GitHub stats');
-                    return [3 /*break*/, 5];
-                case 4:
-                    setLoading(false);
-                    return [7 /*endfinally*/];
-                case 5: return [2 /*return*/];
-            }
-        });
-    }); };
-    React.useEffect(function () {
-        if (username) {
-            fetchData(username);
-        }
-    }, [username]);
-    var refetch = function () { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    if (!username) return [3 /*break*/, 2];
-                    return [4 /*yield*/, fetchData(username)];
-                case 1:
-                    _a.sent();
-                    _a.label = 2;
-                case 2: return [2 /*return*/];
-            }
-        });
-    }); };
-    return (React.createElement(GitHubStatsContext.Provider, { value: {
-            stats: stats,
-            graph: graph,
-            loading: loading,
-            error: error,
-            username: username,
-            setUsername: setUsername,
-            refetch: refetch
-        } }, children));
+// Default stats for initial render or error states
+var defaultStats = {
+    Followers: 0,
+    Repositories: 0,
+    'Pull Requests': 0,
+    Issues: 0,
+    Commits: 0,
+    'Contributed To': 0,
+    'Star Earned': 0,
+    'Total Contributions': 0,
+    'Longest Streak': 0,
+    'Longest Streak Start': null,
+    'Longest Streak End': null,
+    'Current Streak': 0,
+    'Current Streak Start': null,
+    'Current Streak End': null,
+    AvatarUrl: '',
 };
-var useGitHubStatsContext = function () {
-    var context = React.useContext(GitHubStatsContext);
-    if (context === undefined) {
-        throw new Error('useGitHubStatsContext must be used within a GitHubBentoProvider');
-    }
-    return context;
-};
-
 var useGitHubStats = function (options) {
-    if (options === void 0) { options = {}; }
-    options.username; var _a = options.skipContext, skipContext = _a === void 0 ? false : _a, _b = options.cacheTime // Default: 1 hour
-    , cacheTime = _b === void 0 ? 3600000 : _b // Default: 1 hour
-    ;
-    var context = useGitHubStatsContext();
-    var _c = React.useState(null), individualStats = _c[0], setIndividualStats = _c[1];
-    var _d = React.useState(null), individualGraph = _d[0], setIndividualGraph = _d[1];
-    var _e = React.useState(false), loading = _e[0], setLoading = _e[1];
-    var _f = React.useState(null), error = _f[0], setError = _f[1];
-    var _g = React.useState({}), lastFetched = _g[0], setLastFetched = _g[1];
-    // Use context if available and not skipping it
-    var useContextData = !skipContext && context;
-    var username = options.username || (useContextData ? context.username : '');
-    var fetchData = function (username) { return __awaiter(void 0, void 0, void 0, function () {
-        var now, cacheKey, cachedData, cachedTime, _a, stats, graph, _b, statsResult, graphResult, err_1;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
+    var _a = options.username, username = _a === void 0 ? 'idityaGE' : _a, githubToken = options.githubToken;
+    var _b = React.useState(defaultStats), stats = _b[0], setStats = _b[1];
+    var _c = React.useState(null), graph = _c[0], setGraph = _c[1];
+    var _d = React.useState(true), loading = _d[0], setLoading = _d[1];
+    var _e = React.useState(null), error = _e[0], setError = _e[1];
+    var _f = React.useState(username), currentUsername = _f[0], setCurrentUsername = _f[1];
+    var fetchData = function (username, token) { return __awaiter(void 0, void 0, void 0, function () {
+        var _a, statsResult, graphResult, err_1;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
-                    if (!username)
+                    if (!username) {
+                        setError("Username is not provided");
                         return [2 /*return*/];
-                    now = Date.now();
-                    cacheKey = "github-bento-".concat(username);
-                    cachedData = localStorage.getItem(cacheKey);
-                    cachedTime = lastFetched[username];
-                    if (cachedData && cachedTime && now - cachedTime < cacheTime) {
-                        try {
-                            _a = JSON.parse(cachedData), stats = _a.stats, graph = _a.graph;
-                            setIndividualStats(stats);
-                            setIndividualGraph(graph);
-                            return [2 /*return*/];
-                        }
-                        catch (e) {
-                            // If parsing fails, continue with fetching new data
-                        }
                     }
                     setLoading(true);
                     setError(null);
-                    _c.label = 1;
+                    _b.label = 1;
                 case 1:
-                    _c.trys.push([1, 3, 4, 5]);
+                    _b.trys.push([1, 3, 4, 5]);
                     return [4 /*yield*/, Promise.all([
-                            fetchUserStats(username),
-                            fetchUserGraph(username)
+                            fetchUser(username, token),
+                            fetchGraph(username, token)
                         ])];
                 case 2:
-                    _b = _c.sent(), statsResult = _b[0], graphResult = _b[1];
-                    setIndividualStats(statsResult.userStats);
-                    setIndividualGraph(graphResult.graph);
-                    // Cache the results
-                    localStorage.setItem(cacheKey, JSON.stringify({
-                        stats: statsResult.userStats,
-                        graph: graphResult.graph
-                    }));
-                    setLastFetched(function (prev) {
-                        var _a;
-                        return (__assign(__assign({}, prev), (_a = {}, _a[username] = now, _a)));
-                    });
+                    _a = _b.sent(), statsResult = _a[0], graphResult = _a[1];
+                    // Check if we have valid data from the API
+                    if (statsResult.userStats && Object.keys(statsResult.userStats).length > 0 &&
+                        statsResult.userStats.Repositories !== undefined) {
+                        setStats(statsResult.userStats);
+                    }
+                    else {
+                        // Keep the default stats but set error
+                        setError("Could not fetch user data");
+                    }
+                    if (graphResult.graph) {
+                        setGraph(graphResult.graph);
+                    }
                     return [3 /*break*/, 5];
                 case 3:
-                    err_1 = _c.sent();
+                    err_1 = _b.sent();
                     setError(err_1 instanceof Error ? err_1.message : 'Failed to fetch GitHub stats');
                     return [3 /*break*/, 5];
                 case 4:
@@ -565,40 +451,31 @@ var useGitHubStats = function (options) {
         });
     }); };
     React.useEffect(function () {
-        if (useContextData) {
-            // Use data from context
-            return;
-        }
-        else if (username) {
-            // Fetch data individually
-            fetchData(username);
-        }
-    }, [username, useContextData]);
+        // Even if token is missing, we'll attempt to fetch with whatever we have
+        // The component will render with default stats
+        fetchData(currentUsername, githubToken);
+    }, [currentUsername, githubToken]);
+    var setUsername = function (newUsername) {
+        setCurrentUsername(newUsername);
+    };
     var refetch = function () { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0:
-                    if (!username) return [3 /*break*/, 2];
-                    return [4 /*yield*/, fetchData(username)];
+                case 0: return [4 /*yield*/, fetchData(currentUsername, githubToken)];
                 case 1:
                     _a.sent();
-                    _a.label = 2;
-                case 2: return [2 /*return*/];
+                    return [2 /*return*/];
             }
         });
     }); };
-    // Return context data if using context, otherwise return individual data
     return {
-        stats: useContextData ? context.stats : individualStats,
-        graph: useContextData ? context.graph : individualGraph,
-        loading: useContextData ? context.loading : loading,
-        error: useContextData ? context.error : error,
-        username: useContextData ? context.username : username,
-        setUsername: useContextData ? context.setUsername : function (name) {
-            options.username = name;
-            fetchData(name);
-        },
-        refetch: useContextData ? context.refetch : refetch
+        stats: stats,
+        graph: graph,
+        loading: loading,
+        error: error,
+        username: currentUsername,
+        setUsername: setUsername,
+        refetch: refetch
     };
 };
 
@@ -2602,10 +2479,10 @@ var ContributedTo = function (_a) {
 };
 
 var GitHubBento = function (_a) {
-    var username = _a.username, _b = _a.className, className = _b === void 0 ? "" : _b, _c = _a.showGraph, showGraph = _c === void 0 ? true : _c, _d = _a.skipContextProvider, skipContextProvider = _d === void 0 ? false : _d;
+    var _b = _a.username, username = _b === void 0 ? 'idityaGE' : _b, _c = _a.className, className = _c === void 0 ? "" : _c, _d = _a.showGraph, showGraph = _d === void 0 ? false : _d, githubToken = _a.githubToken;
     var _e = useGitHubStats({
         username: username,
-        skipContext: skipContextProvider
+        githubToken: githubToken
     }), stats = _e.stats, graph = _e.graph, loading = _e.loading, error = _e.error;
     if (loading) {
         return (React.createElement("div", { className: "flex items-center justify-center p-10" },
@@ -2630,7 +2507,7 @@ var GitHubBento = function (_a) {
                     React.createElement(CurrentStreak, { streak: stats["Current Streak"] || 0, start: stats["Current Streak Start"] || "", end: stats["Current Streak End"] || "", classname: "p-2 md:col-start-3 md:col-end-5 md:row-start-1 md:row-end-4 col-start-2 col-end-5" }),
                     React.createElement(Followers, { followers: stats.Followers || 0, classname: "p-2 md:col-start-7 md:col-end-9 md:row-start-4 md:row-end-5 row-start-4 row-end-4 col-start-2 col-end-3" }),
                     React.createElement(Repos, { repos: stats.Repositories || 0, classname: "p-2 md:col-start-5 md:col-end-9 md:row-start-1 md:row-end-2 col-start-4 col-end-5 row-start-3 row-end-5" }),
-                    React.createElement(Commit, { commits: stats["Total Contributions"] || stats["Total Contibutions"] || 0, classname: "p-2 md:col-start-5 md:col-end-7 md:row-start-2 md:row-end-5 col-start-1 col-end-4 row-start-3" }),
+                    React.createElement(Commit, { commits: stats["Total Contributions"] || 0, classname: "p-2 md:col-start-5 md:col-end-7 md:row-start-2 md:row-end-5 col-start-1 col-end-4 row-start-3" }),
                     React.createElement(PRs, { pr: stats["Pull Requests"] || 0, classname: "p-2 md:col-start-7 md:col-end-8 md:row-start-2 md:row-end-4 col-start-1 col-end-2 row-start-2" }),
                     React.createElement(ContributedTo, { contros: stats["Contributed To"] || 0, classname: "p-2 md:col-start-3 md:col-end-5 md:row-start-4 md:row-end-5" }),
                     React.createElement(Issues, { issues: stats.Issues || 0, classname: "p-2 md:col-start-8 md:col-end-9 md:row-start-2 md:row-end-4 col-start-1 row-start-4" }),
@@ -2650,7 +2527,6 @@ exports.ContributedTo = ContributedTo;
 exports.CurrentStreak = CurrentStreak;
 exports.Followers = Followers;
 exports.GitHubBento = GitHubBento;
-exports.GitHubBentoProvider = GitHubBentoProvider;
 exports.Issues = Issues;
 exports.LongestStreak = LongestStreak;
 exports.PRs = PRs;

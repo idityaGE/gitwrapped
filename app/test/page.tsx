@@ -1,6 +1,7 @@
 "use client"
 
 import { GitHubBento } from "@/packages/github-bento-stats/src";
+// import GitHubBento from '@/packages/github-bento-stats'
 
 const page = () => {
   const gittoken = process.env.NEXT_PUBLIC_GITHUB_TOKEN

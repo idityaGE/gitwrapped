@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import fetchUser from '../utils/fetchUser';
 import fetchGraph from '../utils/fetchGraph';
-import { UserStats } from '../types/type';
+import type { UserStats } from '../@types/type';
 
 interface UseGitHubStatsOptions {
   username: string;

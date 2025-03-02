@@ -1,4 +1,4 @@
-import { UserData, UserStats } from "../types/type";
+import type { UserData, UserStats } from "../@types/type";
 import { graphQL } from "./graphql";
 import { fetchYearContributions } from "./fetchYearContributions";
 import {

@@ -11,7 +11,7 @@ import {
   ContributedTo
 } from './components/Github/StatComponents';
 import { useGitHubStats } from './hooks/useGitHubStats';
-import { type UserStats } from './types/type';
+import { type UserStats } from './@types/type';
 
 export {
   GitHubBento,

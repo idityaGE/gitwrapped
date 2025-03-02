@@ -31,7 +31,9 @@ export default {
     resolve(),
     commonjs(),
     typescript({
-      useTsconfigDeclarationDir: true
+      tsconfig: './tsconfig.json',
+      declaration: true,
+      declarationDir: 'dist',
     }),
     copy({
       targets: [

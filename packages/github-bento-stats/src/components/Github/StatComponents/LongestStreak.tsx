@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import { Trophy } from "lucide-react";
 import { formatNumber } from "../../../utils/calc";
 
@@ -17,12 +16,11 @@ const LongestStreak = ({
   return (
     <div className={`${classname} flex items-center justify-center flex-col gap-3 relative rounded-3xl overflow-hidden p-3 z-[90] bg-black/90 group cursor-pointer`}>
         {/* <HalfCircleGradient  /> */}
-        <Image
+        <img
             src={`/assets/frame7.svg`}
             alt=""
             width={500}
             height={500}
-            priority
             className="size-full object-cover absolute inset-0 -z-10 rounded-2xl group-hover:opacity-100 opacity-[0.88] cursor-pointer"
         />
         <p className="font-modernbold text-lg lg:text-xl">Longest Streak</p>

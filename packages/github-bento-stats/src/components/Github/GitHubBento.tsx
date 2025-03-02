@@ -1,6 +1,5 @@
 import React from "react";
 import { useGitHubStats } from "../../hooks/useGitHubStats";
-import Image from "next/image";
 import {
   Followers,
   LongestStreak,
@@ -58,7 +57,7 @@ export const GitHubBento: React.FC<GitHubBentoProps> = ({
         >
           <div className="flex items-center justify-center gap-4 sm:px-10 px-3  mb-2">
             <div className="">
-              <Image
+              <img
                 src={stats.AvatarUrl || "/assets/user.svg"}
                 alt="User Avatar"
                 width={100}

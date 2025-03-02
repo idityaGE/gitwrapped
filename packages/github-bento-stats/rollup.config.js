@@ -3,6 +3,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import typescript from 'rollup-plugin-typescript2';
 import json from '@rollup/plugin-json';
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
+import copy from 'rollup-plugin-copy';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
@@ -31,6 +32,11 @@ export default {
     commonjs(),
     typescript({
       useTsconfigDeclarationDir: true
+    }),
+    copy({
+      targets: [
+        { src: 'src/images', dest: 'dist/images' }
+      ]
     })
   ]
 };

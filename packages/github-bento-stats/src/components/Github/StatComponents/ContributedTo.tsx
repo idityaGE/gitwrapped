@@ -1,6 +1,5 @@
 import { formatNumber } from "../../../utils/calc";
 import { GitMerge } from "lucide-react";
-import Image from "next/image";
 import React from "react";
 
 const ContributedTo = ({
@@ -15,12 +14,11 @@ const ContributedTo = ({
       className={`${classname} flex items-center justify-center flex-col gap-3 relative rounded-3xl overflow-hidden bg-black/90  z-[90]  group cursor-pointer`}
     >
       {/* <HalfCircleGradient  /> */}
-      <Image
+      <img
         src={`/assets/grad11.svg`}
         alt=""
         width={500}
         height={500}
-        priority
         className="size-full object-cover absolute inset-0 -z-10 rounded-xl opacity-70 group-hover:opacity-100 object-left-bottom max-sm:object-right-top"
       />
       <div className="absolute top-3 left-3 max-sm:top-2 max-sm:left-2 max-lg:flex max-md:block gap-2" >

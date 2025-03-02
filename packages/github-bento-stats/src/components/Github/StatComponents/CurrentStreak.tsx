@@ -1,6 +1,5 @@
 import { formatNumber } from "../../../utils/calc";
 import { Flame } from "lucide-react";
-import Image from "next/image";
 import React from "react";
 
 const CurrentStreak = ({
@@ -18,12 +17,11 @@ const CurrentStreak = ({
     <div
       className={`${classname} flex items-center justify-center flex-col gap-3 relative rounded-3xl overflow-hidden p-5 max-lg:p-3 bg-black/90 z-[90]  group cursor-pointer`}
     >
-      <Image
+      <img
         src={`/assets/frame9.svg`}
         alt=""
         width={500}
         height={500}
-        priority
         className="size-full object-cover absolute inset-0 top-1 -z-10 rounded-2xl opacity-80 group-hover:opacity-100"
       />
       <div className="relative items-center justify-center">
